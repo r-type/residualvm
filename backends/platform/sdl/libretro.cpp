@@ -237,7 +237,7 @@ int pre_main(const char *argv)
 
    parse_cmdline(argv); 
 
-   Only1Arg = (strcmp(ARGUV[0],"scummvm") == 0) ? 0 : 1;
+   Only1Arg = (strcmp(ARGUV[0],"residualvm") == 0) ? 0 : 1;
 
    for (i = 0; i<64; i++)
       xargv_cmd[i] = NULL;
@@ -247,12 +247,22 @@ int pre_main(const char *argv)
    {  
       int cfgload=0;
 
-      Add_Option("scummvm");
+      Add_Option("residualvm");
 
       Add_Option("--joystick=0");
+#ifdef WIIU
       Add_Option("--savepath=sd:/retroarch/cores/system");
       Add_Option("--extrapath=sd:/retroarch/cores/system");
       Add_Option("--themepath=sd:/retroarch/cores/system");
+#else
+      char tmppath[512];
+      sprintf(tmppath, "--savepath=%s\0",RETRO_DIR);
+      Add_Option(tmppath);
+      sprintf(tmppath, "--extrapath=%s\0",RETRO_DIR);
+      Add_Option(tmppath);
+      sprintf(tmppath, "--themepath=%s\0",RETRO_DIR);
+      Add_Option(tmppath);
+#endif
       Add_Option("--bpp=32");
 
       if (strlen(RPATH) >= strlen(".scummvm")){
