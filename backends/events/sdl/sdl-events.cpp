@@ -521,8 +521,8 @@ bool retroCheckThread(uint32 offset = 0)
 
             static uint32 buf[735];
 
-	   // int count=((OSystem_SDL* )g_system)->getMixerManager()->retrocallbackHandler((byte *)buf,  735*4);
-memset(buf,0,735*4);int count=735;
+	    int count=((OSystem_SDL* )g_system)->getMixerManager()->retrocallbackHandler((byte *)buf,  735*4);
+//memset(buf,0,735*4);int count=735;
 	    void retro_audiocb(signed short int *sound_buffer,int sndbufsize);
 	    retro_audiocb((signed short int *)buf,count);
 
