@@ -217,7 +217,7 @@ Common::WriteStream *OSystem_POSIX::createLogFile() {
 bool OSystem_POSIX::displayLogFile() {
 	if (_logFilePath.empty())
 		return false;
-
+#ifndef WIIU
 	// FIXME: This may not work perfectly when in fullscreen mode.
 	// On my system it drops from fullscreen without ScummVM noticing,
 	// so the next Alt-Enter does nothing, going from windowed to windowed.
@@ -263,6 +263,9 @@ bool OSystem_POSIX::displayLogFile() {
 	}
 
 	return WIFEXITED(status) && WEXITSTATUS(status) == 0;
+#else
+	return false;
+#endif
 }
 
 bool OSystem_POSIX::openUrl(const Common::String &url) {
@@ -303,11 +306,15 @@ bool OSystem_POSIX::openUrl(const Common::String &url) {
 }
 
 bool OSystem_POSIX::launchBrowser(const Common::String& client, const Common::String &url) {
+#ifdef WIIU
+	return false;
+#else
 	// FIXME: system's input must be heavily escaped
 	// well, when url's specified by user
 	// it's OK now (urls are hardcoded somewhere in GUI)
 	Common::String cmd = client + " " + url;
 	return (system(cmd.c_str()) != -1);
+#endif
 }
 
 

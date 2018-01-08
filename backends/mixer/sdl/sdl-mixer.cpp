@@ -47,13 +47,14 @@ SdlMixerManager::SdlMixerManager()
 
 SdlMixerManager::~SdlMixerManager() {
 	_mixer->setReady(false);
-
+#ifndef __LIBRETRO__
 	SDL_CloseAudio();
-
+#endif
 	delete _mixer;
 }
 
 void SdlMixerManager::init() {
+#ifndef __LIBRETRO__
 	// Start SDL Audio subsystem
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) == -1) {
 		error("Could not initialize SDL: %s", SDL_GetError());
@@ -119,6 +120,9 @@ void SdlMixerManager::init() {
 #endif
 
 	_mixer = new Audio::MixerImpl(g_system, _obtained.freq);
+#else
+	_mixer = new Audio::MixerImpl(g_system, 44100);
+#endif
 	assert(_mixer);
 	_mixer->setReady(true);
 
@@ -144,6 +148,7 @@ static uint32 roundDownPowerOfTwo(uint32 samples) {
 }
 
 SDL_AudioSpec SdlMixerManager::getAudioSpec(uint32 outputRate) {
+#ifndef __LIBRETRO__
 	SDL_AudioSpec desired;
 
 	const char *const appDomain = Common::ConfigManager::kApplicationDomain;
@@ -186,13 +191,27 @@ SDL_AudioSpec SdlMixerManager::getAudioSpec(uint32 outputRate) {
 	desired.userdata = this;
 
 	return desired;
+#else 
+	SDL_AudioSpec desired;
+	memset(&desired, 0, sizeof(desired));
+	return desired;
+#endif
 }
 
 void SdlMixerManager::startAudio() {
+#ifndef __LIBRETRO__
 	// Start the sound system
 	SDL_PauseAudio(0);
+#endif
 }
 
+#ifdef __LIBRETRO__
+int SdlMixerManager::retrocallbackHandler(byte *samples, int len){
+	assert(_mixer);
+	int count =_mixer->mixCallback(samples, len);
+	return count;
+}
+#endif
 void SdlMixerManager::callbackHandler(byte *samples, int len) {
 	assert(_mixer);
 	_mixer->mixCallback(samples, len);
@@ -206,17 +225,22 @@ void SdlMixerManager::sdlCallback(void *this_, byte *samples, int len) {
 }
 
 void SdlMixerManager::suspendAudio() {
+#ifndef __LIBRETRO__
 	SDL_CloseAudio();
+#endif
 	_audioSuspended = true;
+
 }
 
 int SdlMixerManager::resumeAudio() {
 	if (!_audioSuspended)
 		return -2;
+#ifndef __LIBRETRO__
 	if (SDL_OpenAudio(&_obtained, NULL) < 0) {
 		return -1;
 	}
 	SDL_PauseAudio(0);
+#endif
 	_audioSuspended = false;
 	return 0;
 }

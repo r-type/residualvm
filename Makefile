@@ -7,7 +7,7 @@ srcdir      ?= .
 
 DEFINES     := -DHAVE_CONFIG_H
 LDFLAGS     :=
-INCLUDES    := -I. -I$(srcdir) -I$(srcdir)/engines
+INCLUDES    := -I. -I$(srcdir) -I$(srcdir)/engines -I$(srcdir)/backends/platform/sdl/deps/include/SDL
 LIBS        :=
 OBJS        :=
 DEPDIR      := .deps
@@ -94,7 +94,7 @@ ifeq "$(findstring config.mk,$(MAKEFILE_LIST))" "config.mk"
 			CXXFLAGS="$(SAVED_CXXFLAGS)" CPPFLAGS="$(SAVED_CPPFLAGS)" \
 			ASFLAGS="$(SAVED_ASFLAGS)" WINDRESFLAGS="$(SAVED_WINDRESFLAGS)" \
 			SDL_CONFIG="$(SAVED_SDL_CONFIG)" \
-			$(srcdir)/configure $(SAVED_CONFIGFLAGS)
+			$(srcdir)/confiture $(SAVED_CONFIGFLAGS)
 else
 	$(error You need to run $(srcdir)/configure before you can run make. Check $(srcdir)/configure --help for a list of parameters)
 endif

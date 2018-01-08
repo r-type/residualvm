@@ -581,9 +581,16 @@ uint32 OSystem_SDL::getMillis(bool skipRecord) {
 	return millis;
 }
 
+#ifdef __LIBRETRO__
+extern bool retroCheckThread(uint32 offset);
+#endif
+
 void OSystem_SDL::delayMillis(uint msecs) {
 #ifdef ENABLE_EVENTRECORDER
 	if (!g_eventRec.processDelayMillis())
+#endif
+#ifdef __LIBRETRO__
+	if(!retroCheckThread(msecs))
 #endif
 		SDL_Delay(msecs);
 }

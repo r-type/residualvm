@@ -169,7 +169,9 @@ bool MacResManager::open(const String &fileName) {
 
 bool MacResManager::open(const FSNode &path, const String &fileName) {
 	close();
-
+#ifdef WIIU
+return false;
+#endif
 #ifdef MACOSX
 	// Check the actual fork on a Mac computer
 	String fullPath = path.getPath() + "/" + fileName + "/..namedfork/rsrc";

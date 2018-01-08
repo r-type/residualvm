@@ -1,0 +1,21 @@
+CREATE residualvm_libretro_wiiu.a
+ADDLIB libtemp/libaudio.a
+ADDLIB libtemp/libbackends.a
+ADDLIB libtemp/libbase.a
+ADDLIB libtemp/libcommon.a
+ADDLIB libtemp/libdeps.a
+ADDLIB libtemp/libengines.a
+ADDLIB libtemp/libgraphics.a
+ADDLIB libtemp/libgrim.a
+ADDLIB libtemp/libgui.a
+ADDLIB libtemp/libimage.a
+ADDLIB libtemp/libmath.a
+ADDLIB libtemp/libmyst3.a
+ADDMOD libtemp/libretro.o
+ADDLIB libtemp/libvideo.a
+ADDMOD libtemp/posix-main.o
+ADDMOD libtemp/posix.o
+ADDMOD libtemp/sdl.o
+ADDMOD libtemp/sdl-window.o
+SAVE
+END

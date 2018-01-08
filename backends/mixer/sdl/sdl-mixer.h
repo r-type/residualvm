@@ -58,6 +58,9 @@ public:
 	 * Resumes the audio system
 	 */
 	virtual int resumeAudio();
+#ifdef __LIBRETRO__
+	virtual int retrocallbackHandler(byte *samples, int len);
+#endif
 
 protected:
 	/** The mixer implementation */

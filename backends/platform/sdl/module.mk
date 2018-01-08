@@ -4,6 +4,11 @@ MODULE_OBJS := \
 	sdl.o \
 	sdl-window.o
 
+ifdef LIBRETRO
+MODULE_OBJS += \
+	libretro.o 
+endif
+
 ifdef POSIX
 MODULE_OBJS += \
 	posix/posix-main.o \

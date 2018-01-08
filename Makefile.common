@@ -36,6 +36,10 @@ ifdef USE_MT32EMU
 MODULES += audio/softsynth/mt32
 endif
 
+ifdef LIBRETRO
+MODULES += backends/platform/sdl/deps
+endif
+
 ######################################################################
 # The build rules follow - normally you should have no need to
 # touch whatever comes after here.
@@ -80,7 +84,14 @@ endif
 
 # The build rule for the ResidualVM executable
 $(EXECUTABLE): $(OBJS)
+ifeq ($(platform), wiiu)
+	echo $(OBJS)
+	$(MKDIR) libtemp
+	cp  $(OBJS) libtemp/
+	$(AR_ALONE) -M < full.mri
+else
 	$(QUIET_LINK)$(LD) $(LDFLAGS) $(PRE_OBJS_FLAGS) $+ $(POST_OBJS_FLAGS) $(LIBS) -o $@
+endif
 
 distclean: clean clean-devtools
 	$(RM) config.h config.mk config.log engines/engines.mk engines/plugins_table.h
@@ -88,8 +99,10 @@ distclean: clean clean-devtools
 clean:
 	$(RM_REC) $(DEPDIRS)
 	$(RM) $(OBJS) $(EXECUTABLE)
-
-
+	$(RM_REC) libtemp
+ifeq ($(platform), wiiu)
+	$(RM) residualvm_libretro_wiiu.a
+endif
 #
 # The build rules for object files.
 #

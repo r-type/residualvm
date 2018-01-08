@@ -56,12 +56,21 @@
 #define JOY_XAXIS 0
 #define JOY_YAXIS 1
 // buttons
+#ifdef __LIBRETRO__
+#define JOY_BUT_LMOUSE 10
+#define JOY_BUT_RMOUSE 11
+#define JOY_BUT_ESCAPE 13
+#define JOY_BUT_PERIOD 1
+#define JOY_BUT_SPACE 9
+#define JOY_BUT_F5 3
+#else
 #define JOY_BUT_LMOUSE 0
 #define JOY_BUT_RMOUSE 2
 #define JOY_BUT_ESCAPE 3
 #define JOY_BUT_PERIOD 1
 #define JOY_BUT_SPACE 4
 #define JOY_BUT_F5 5
+#endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 static uint32 convUTF8ToUTF32(const char *src) {
@@ -501,6 +510,34 @@ Common::KeyCode SdlEventSource::SDLToOSystemKeycode(const SDLKey key) {
 	}
 }
 
+#ifdef __LIBRETRO__
+extern int retro_quit;
+static uint32 _threadExitTime=10;
+
+bool retroCheckThread(uint32 offset = 0)
+{
+         if(_threadExitTime <= (g_system->getMillis() + offset))
+         {
+
+            static uint32 buf[735];
+
+	   // int count=((OSystem_SDL* )g_system)->getMixerManager()->retrocallbackHandler((byte *)buf,  735*4);
+memset(buf,0,735*4);int count=735;
+	    void retro_audiocb(signed short int *sound_buffer,int sndbufsize);
+	    retro_audiocb((signed short int *)buf,count);
+
+            extern void retro_leave_thread();
+            retro_leave_thread();
+
+            _threadExitTime = g_system->getMillis() + 10;
+            return true;
+         }
+
+         return false;
+}
+
+#endif
+
 bool SdlEventSource::pollEvent(Common::Event &event) {
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -538,7 +575,16 @@ bool SdlEventSource::pollEvent(Common::Event &event) {
 	if (handleKbdMouse(event)) {
 		return true;
 	}
+#ifdef __LIBRETRO__
 
+	retroCheckThread();
+
+	 if(retro_quit==1){
+		warning("want to quit!!");
+		event.type = Common::EVENT_QUIT;
+		g_system->getEventManager()->pushEvent(event);
+	 }
+#endif
 	return false;
 }
 

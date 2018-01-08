@@ -107,6 +107,13 @@ void SurfaceSdlGraphicsManager::setupScreen(uint gameWidth, uint gameHeight, boo
 #endif // SDL_VERSION_ATLEAST(2, 0, 0)
 }
 
+#ifdef __LIBRETRO__
+extern unsigned /*short*/ int *videoBuffer;
+extern int max_width,retrow;
+extern int max_height,retroh;
+extern int NEWGAME_SIZE;
+#endif
+
 void SurfaceSdlGraphicsManager::createOrUpdateScreen() {
 	closeOverlay();
 
@@ -133,6 +140,19 @@ void SurfaceSdlGraphicsManager::createOrUpdateScreen() {
 		sdlflags |= SDL_FULLSCREEN;
 
 	_screen = SDL_SetVideoMode(effectiveWidth, effectiveHeight, ConfMan.getInt("bpp"), sdlflags);
+#ifdef __LIBRETRO__
+	warning("(%dx%d)x%d\n",effectiveWidth,effectiveHeight,ConfMan.getInt("bpp"));
+
+	if(effectiveWidth>max_width || effectiveHeight>max_height)
+		NEWGAME_SIZE=1;
+	else if(effectiveWidth != retrow ||  effectiveHeight != retroh)
+		NEWGAME_SIZE=2;
+
+	retrow=effectiveWidth;
+	retroh=effectiveHeight;
+
+	videoBuffer=(unsigned /*short*/ int*)_screen->pixels;
+#endif
 	if (!_screen) {
 		warning("Error: %s", SDL_GetError());
 		g_system->quit();
@@ -144,7 +164,9 @@ void SurfaceSdlGraphicsManager::createOrUpdateScreen() {
 
 	_overlayFormat = Graphics::PixelFormat(f->BytesPerPixel, 8 - f->Rloss, 8 - f->Gloss, 8 - f->Bloss, 0,
 	                                       f->Rshift, f->Gshift, f->Bshift, f->Ashift);
-
+#ifdef __LIBRETRO__
+warning("overlay(%dx%d)x%d\n",effectiveWidth, effectiveHeight, f->BitsPerPixel);
+#endif
 	if (!_overlayscreen) {
 		warning("Error: %s", SDL_GetError());
 		g_system->quit();

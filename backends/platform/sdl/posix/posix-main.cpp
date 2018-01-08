@@ -28,7 +28,7 @@
 #include "backends/plugins/sdl/sdl-provider.h"
 #include "base/main.h"
 
-int main(int argc, char *argv[]) {
+int smain(int argc, char *argv[]) {
 
 	// Create our OSystem instance
 	g_system = new OSystem_POSIX();
