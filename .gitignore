@@ -10,7 +10,6 @@ lib*.a
 /residualvm
 /residualvm-static
 /ResidualVMDockTilePlugin*
-/config.h
 /.gdb_history
 /dumps
 /Credits.rtf
