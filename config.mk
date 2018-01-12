@@ -4,6 +4,7 @@ platform ?=unix
 DEPS_DIR := backends/platform/sdl/deps
 
 ifeq ($(platform), unix)
+#UNIX
 CXX := g++
 CC := gcc
 CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long 
@@ -18,6 +19,7 @@ AS := as
 ASFLAGS := 
 LITE := 1
 else ifeq ($(platform), wincross64)
+#WINDOWS64 cross
 AR = x86_64-w64-mingw32-ar rcs
 CC = x86_64-w64-mingw32-gcc
 CXX = x86_64-w64-mingw32-g++ 
@@ -29,8 +31,8 @@ RANLIB := x86_64-w64-mingw32-ranlib
 STRIP := x86_64-w64-mingw32-strip
 ASFLAGS := 
 LITE := 1
-
 else ifeq ($(platform), wiiu)
+#WIIU
 CXX := $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 CC := $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
 CXXFLAGS := -DHAVE_LIBCO=1 -D__LIBRETRO__ -fno-exceptions -Os -fpermissive
@@ -49,6 +51,19 @@ AS := $(DEVKITPPC)/bin/powerpc-eabi-as
 ASFLAGS :=
 TARGET := $(TARGET_NAME)_libretro_wiiu.a
 STATIC_LINKING = 1
+LITE := 1
+else
+#WINDOWS
+AR = ar rcs
+CC = gcc
+CXX = g++ 
+CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -fpermissive -DWIN32
+CFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native  -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32
+LIBS += -lws2_32 -luser32 -lwinmm -ladvapi32 -lshlwapi -lwsock32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -lmingw32 -shared -lgcc -lm -lmingw32
+LD := g++ 
+RANLIB := ranlib
+STRIP := strip
+ASFLAGS := 
 LITE := 1
 endif
 
