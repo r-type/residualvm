@@ -342,20 +342,37 @@ MODULE_OBJS += \
 	sdl-libretro/src/video/libretro/SDL_LIBRETROmouse.o \
 	sdl-libretro/src/video/libretro/SDL_LIBRETROevents.o \
 	sdl-libretro/src/video/libretro/SDL_LIBRETROvideo.o \
-	sdl-libretro/src/video/libretro/SDL_LIBRETROkeyboard.o sdl-libretro/src/thread/pthread/SDL_syscond.o \
-	sdl-libretro/src/thread/pthread/SDL_syssem.o sdl-libretro/src/thread/pthread/SDL_sysmutex.o \
-	sdl-libretro/src/thread/pthread/SDL_systhread.o sdl-libretro/src/joystick/libretro/SDL_sysjoystick.o \
+	sdl-libretro/src/video/libretro/SDL_LIBRETROkeyboard.o sdl-libretro/src/joystick/libretro/SDL_sysjoystick.o \
 	sdl-libretro/src/timer/libretro/SDL_systimer.o sdl-libretro/src/audio/libretro/SDL_LIBRETROaudio.o \
 	sdl-libretro/src/loadso/dummy/SDL_sysloadso.o 
 
 ifeq ($(platform), unix)
-MODULE_OBJS += sdl-libretro/src/cdrom/linux/SDL_syscdrom.o
+MODULE_OBJS += sdl-libretro/src/cdrom/linux/SDL_syscdrom.o \
+sdl-libretro/src/thread/pthread/SDL_syscond.o \
+	sdl-libretro/src/thread/pthread/SDL_syssem.o sdl-libretro/src/thread/pthread/SDL_sysmutex.o \
+	sdl-libretro/src/thread/pthread/SDL_systhread.o 
 endif
+
 ifeq ($(platform), win)
-MODULE_OBJS += sdl-libretro/src/cdrom/win32/SDL_syscdrom.o
+MODULE_OBJS += sdl-libretro/src/cdrom/win32/SDL_syscdrom.o \
+	sdl-libretro/src/thread/generic/SDL_syscond.o \
+	sdl-libretro/src/thread/win32/SDL_syssem.o sdl-libretro/src/thread/win32/SDL_sysmutex.o \
+	sdl-libretro/src/thread/win32/SDL_systhread.o
 endif
+
+
+ifeq ($(platform), wincross64)
+MODULE_OBJS += sdl-libretro/src/cdrom/win32/SDL_syscdrom.o \
+	sdl-libretro/src/thread/generic/SDL_syscond.o \
+	sdl-libretro/src/thread/win32/SDL_syssem.o sdl-libretro/src/thread/win32/SDL_sysmutex.o \
+	sdl-libretro/src/thread/win32/SDL_systhread.o
+endif
+
 ifeq ($(platform), wiiu)
-MODULE_OBJS += sdl-libretro/src/cdrom/dummy/SDL_syscdrom.o
+MODULE_OBJS += sdl-libretro/src/cdrom/dummy/SDL_syscdrom.o\
+	sdl-libretro/src/thread/pthread/SDL_syscond.o \
+	sdl-libretro/src/thread/pthread/SDL_syssem.o sdl-libretro/src/thread/pthread/SDL_sysmutex.o \
+	sdl-libretro/src/thread/pthread/SDL_systhread.o 
 endif
 
 # We don't use rules.mk but rather manually update OBJS and MODULE_DIRS.

@@ -51,6 +51,13 @@
 #include <os2.h>
 #endif
 
+#if defined(WIN32)
+#define rslash '\\'
+#define rslash2 "\\"
+#else   
+#define rslash '/'
+#define rslash2 "/"
+#endif
 
 void POSIXFilesystemNode::setFlags() {
 	struct stat st;
@@ -81,8 +88,8 @@ POSIXFilesystemNode::POSIXFilesystemNode(const Common::String &p) {
 	if (!(_path.size() == 3 && _path.hasSuffix(":/")))
 #endif
 	// Normalize the path (that is, remove unneeded slashes etc.)
-	_path = Common::normalizePath(_path, '/');
-	_displayName = Common::lastPathComponent(_path, '/');
+	_path = Common::normalizePath(_path, rslash);
+	_displayName = Common::lastPathComponent(_path, rslash);
 
 	// TODO: should we turn relative paths into absolute ones?
 	// Pro: Ensures the "getParent" works correctly even for relative dirs.
@@ -110,13 +117,13 @@ AbstractFSNode *POSIXFilesystemNode::getChild(const Common::String &n) const {
 	assert(_isDirectory);
 
 	// Make sure the string contains no slashes
-	assert(!n.contains('/'));
+	assert(!n.contains(rslash));
 
 	// We assume here that _path is already normalized (hence don't bother to call
 	//  Common::normalizePath on the final path).
 	Common::String newPath(_path);
-	if (_path.lastChar() != '/')
-		newPath += '/';
+	if (_path.lastChar() != rslash)
+		newPath += rslash;
 	newPath += n;
 
 	return makeNode(newPath);
@@ -125,7 +132,7 @@ AbstractFSNode *POSIXFilesystemNode::getChild(const Common::String &n) const {
 bool POSIXFilesystemNode::getChildren(AbstractFSList &myList, ListMode mode, bool hidden) const {
 	assert(_isDirectory);
 
-#ifdef __OS2__
+#if defined( __OS2__)
 	if (_path == "/") {
 		// Special case for the root dir: List all DOS drives
 		ULONG ulDrvNum;
@@ -173,11 +180,11 @@ bool POSIXFilesystemNode::getChildren(AbstractFSList &myList, ListMode mode, boo
 		// Start with a clone of this node, with the correct path set
 		POSIXFilesystemNode entry(*this);
 		entry._displayName = dp->d_name;
-		if (_path.lastChar() != '/')
-			entry._path += '/';
+		if (_path.lastChar() != rslash)
+			entry._path += rslash;
 		entry._path += entry._displayName;
 
-#if defined(SYSTEM_NOT_SUPPORTING_D_TYPE)
+#if defined(SYSTEM_NOT_SUPPORTING_D_TYPE) || defined(WIN32)
 		/* TODO: d_type is not part of POSIX, so it might not be supported
 		 * on some of our targets. For those systems where it isn't supported,
 		 * add this #elif case, which tries to use stat() instead.
@@ -222,7 +229,7 @@ bool POSIXFilesystemNode::getChildren(AbstractFSList &myList, ListMode mode, boo
 }
 
 AbstractFSNode *POSIXFilesystemNode::getParent() const {
-	if (_path == "/")
+	if (_path == rslash2)
 		return 0;	// The filesystem root has no parent
 
 #ifdef __OS2__
@@ -236,7 +243,7 @@ AbstractFSNode *POSIXFilesystemNode::getParent() const {
 
 	// Strip of the last component. We make use of the fact that at this
 	// point, _path is guaranteed to be normalized
-	while (end > start && *(end-1) != '/')
+	while (end > start && *(end-1) != rslash)
 		end--;
 
 	if (end == start) {
@@ -262,7 +269,11 @@ bool POSIXFilesystemNode::create(bool isDirectoryFlag) {
 	bool success;
 
 	if (isDirectoryFlag) {
+#if defined(WIN32)
+		success = mkdir(_path.c_str()) == 0;
+#else
 		success = mkdir(_path.c_str(), 0755) == 0;
+#endif
 	} else {
 		int fd = open(_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0755);
 		success = fd >= 0;
@@ -305,22 +316,22 @@ bool assureDirectoryExists(const Common::String &dir, const char *prefix) {
 	Common::String path;
 	if (prefix) {
 		path = prefix;
-		path += '/';
+		path += rslash;
 		path += dir;
 	} else {
 		path = dir;
 	}
 
-	path = Common::normalizePath(path, '/');
+	path = Common::normalizePath(path, rslash);
 
 	const Common::String::iterator end = path.end();
 	Common::String::iterator cur = path.begin();
-	if (*cur == '/')
+	if (*cur == rslash)
 		++cur;
 
 	do {
 		if (cur + 1 != end) {
-			if (*cur != '/') {
+			if (*cur != rslash) {
 				continue;
 			}
 
@@ -329,8 +340,11 @@ bool assureDirectoryExists(const Common::String &dir, const char *prefix) {
 			// simplifies the code a lot.
 			*cur = '\0';
 		}
-
+#if defined(WIN32)
+		if (mkdir(path.c_str()) != 0) {
+#else
 		if (mkdir(path.c_str(), 0755) != 0) {
+#endif
 			if (errno == EEXIST) {
 				if (stat(path.c_str(), &sb) != 0) {
 					return false;
@@ -342,7 +356,7 @@ bool assureDirectoryExists(const Common::String &dir, const char *prefix) {
 			}
 		}
 
-		*cur = '/';
+		*cur = rslash;
 	} while (cur++ != end);
 
 	return true;

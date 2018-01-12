@@ -44,6 +44,14 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#if defined(WIN32)
+#define rslash '\\'
+#define rslash2 "\\"
+#else   
+#define rslash '/'
+#define rslash2 "/"
+#endif
+
 POSIXSaveFileManager::POSIXSaveFileManager() {
 	// Register default savepath.
 #if defined(SAMSUNGTV)
@@ -68,8 +76,11 @@ POSIXSaveFileManager::POSIXSaveFileManager() {
 	envVar = getenv("HOME");
 	if (envVar && *envVar) {
 		savePath = envVar;
+#if defined(WIN32)
 		savePath += "/.residualvm";
-
+#else
+		savePath += "\\.residualvm";
+#endif
 		struct stat sb;
 		if (stat(savePath.c_str(), &sb) != 0 || !S_ISDIR(sb.st_mode)) {
 			savePath.clear();
@@ -87,19 +98,26 @@ POSIXSaveFileManager::POSIXSaveFileManager() {
 			envVar = getenv("HOME");
 			if (envVar && *envVar) {
 				prefix = envVar;
+#if defined(WIN32)
+				savePath = ".local\\share\\";
+#else
 				savePath = ".local/share/";
+#endif
 			}
 		} else {
 			prefix = envVar;
 		}
 
 		// Our default save path is '$XDG_DATA_HOME/residualvm/saves'
+#if defined(WIN32)
+		savePath += "residualvm\\saves";
+#else
 		savePath += "residualvm/saves";
-
+#endif
 		if (!Posix::assureDirectoryExists(savePath, prefix.c_str())) {
 			savePath.clear();
 		} else {
-			savePath = prefix + '/' + savePath;
+			savePath = prefix + rslash + savePath;
 		}
 	}
 
@@ -153,7 +171,11 @@ void POSIXSaveFileManager::checkPath(const Common::FSNode &dir) {
 			setError(Common::kUnknownError, "The path name is too long: "+path);
 			break;
 		case ENOENT:
+#if defined(WIN32)
+			if (mkdir(path.c_str()) != 0) {
+#else
 			if (mkdir(path.c_str(), 0755) != 0) {
+#endif
 				// mkdir could fail for various reasons: The parent dir doesn't exist,
 				// or is not writeable, the path could be completly bogus, etc.
 				warning("mkdir for '%s' failed", path.c_str());

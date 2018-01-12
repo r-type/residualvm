@@ -270,6 +270,7 @@ int pre_main(const char *argv)
       			char* path = strdup(RPATH);
       			char* gamedir = dirname(path);
 			// Retrieve the file data.
+
          		FILE * gamefile;
          		if (gamefile = fopen(RPATH, "r"))
          		{

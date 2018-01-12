@@ -17,6 +17,19 @@ AR := ar cru
 AS := as
 ASFLAGS := 
 LITE := 1
+else ifeq ($(platform), wincross64)
+AR = x86_64-w64-mingw32-ar rcs
+CC = x86_64-w64-mingw32-gcc
+CXX = x86_64-w64-mingw32-g++ 
+CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -fpermissive -DWIN32
+CFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native  -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32
+LIBS += -lws2_32 -luser32 -lwinmm -ladvapi32 -lshlwapi -lwsock32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -lmingw32 -shared -lgcc -lm -lmingw32
+LD := x86_64-w64-mingw32-g++ 
+RANLIB := x86_64-w64-mingw32-ranlib
+STRIP := x86_64-w64-mingw32-strip
+ASFLAGS := 
+LITE := 1
+
 else ifeq ($(platform), wiiu)
 CXX := $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 CC := $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
@@ -143,8 +156,12 @@ INCLUDES += -I$(DEPS_DIR)/freetype/include
 OBJS += 
 
 DEFINES += -DSDL_BACKEND -DPOSIX -DDATA_PATH=\"${datarootdir}/residualvm\" -DPLUGIN_DIRECTORY=\"${exec_prefix}/lib/residualvm\"
-LDFLAGS += -fPIC  -shared -Wl,--no-undefined -Wl,--version-script=./link.T
 
+ifeq ($(platform), wincross64)
+LDFLAGS += --shared -static-libgcc -static-libstdc++ -Wl,--version-script=./link.T -L/usr/x86_64-w64-mingw32/lib -Wl,--export-all-symbols
+else
+LDFLAGS += -fPIC  -shared -Wl,--no-undefined -Wl,--version-script=./link.T
+endif
 
 port_mk = ports.mk
 

@@ -46,7 +46,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
+#if !defined(WIN32)
 #include <sys/wait.h>
+#endif
 #include <unistd.h>
 
 OSystem_POSIX::OSystem_POSIX(Common::String baseConfigName)
@@ -217,7 +219,7 @@ Common::WriteStream *OSystem_POSIX::createLogFile() {
 bool OSystem_POSIX::displayLogFile() {
 	if (_logFilePath.empty())
 		return false;
-#ifndef WIIU
+#if !defined(WIIU) && !defined(WIN32)
 	// FIXME: This may not work perfectly when in fullscreen mode.
 	// On my system it drops from fullscreen without ScummVM noticing,
 	// so the next Alt-Enter does nothing, going from windowed to windowed.
@@ -306,7 +308,7 @@ bool OSystem_POSIX::openUrl(const Common::String &url) {
 }
 
 bool OSystem_POSIX::launchBrowser(const Common::String& client, const Common::String &url) {
-#ifdef WIIU
+#if defined(WIIU) || defined(WIN32)
 	return false;
 #else
 	// FIXME: system's input must be heavily escaped

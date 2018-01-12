@@ -49,13 +49,16 @@
 #if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__
 #include <sys/types.h> /* for off_t */
 #define FLAC__off_t __int64 /* use this instead of off_t to fix the 2 GB limit */
-#if !defined __MINGW32__
+#if !defined(__MINGW32__) 
 #define fseeko _fseeki64
 #define ftello _ftelli64
 #else /* MinGW */
-#if !defined(HAVE_FSEEKO)
+#if !defined(HAVE_FSEEKO) &&!defined(__MINGW64__) 
 #define fseeko fseeko64
 #define ftello ftello64
+#else
+//#define fseeko _fseeki64
+//#define ftello _ftelli64
 #endif
 #endif
 #else
@@ -139,7 +142,7 @@
 #  endif
 #endif /* defined _MSC_VER */
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__LIBRETRO__)
 /* All char* strings are in UTF-8 format. Added to support Unicode files on Windows */
 #include "share/win_utf8_io.h"
 
