@@ -327,7 +327,7 @@ void lua_error(const char *s) {
 	if (s)
 		message(s);
 	if (lua_state->errorJmp) {
-		longjmp(*((jmp_buf *)lua_state->errorJmp), 1);
+		__builtin_longjmp(*((jmp_buf *)lua_state->errorJmp), 1);
 	} else {
 		fprintf(stderr, "lua: exit(1). Unable to recover\n");
 		exit(1);
@@ -358,7 +358,7 @@ int32 luaD_protectedrun(int32 nResults) {
 	lua_state->errorJmp = &myErrorJmp;
 	lua_state->state_counter1++;
 	lua_Task *tmpTask = lua_state->task;
-	if (setjmp(myErrorJmp) == 0) {
+	if (__builtin_setjmp(myErrorJmp) == 0) {
 		do_callinc(nResults);
 		status = 0;
 	} else { // an error occurred: restore lua_state->Cstack and lua_state->stack.top
@@ -385,7 +385,7 @@ static int32 protectedparser(ZIO *z, int32 bin) {
 	jmp_buf myErrorJmp;
 	jmp_buf *oldErr = lua_state->errorJmp;
 	lua_state->errorJmp = &myErrorJmp;
-	if (setjmp(myErrorJmp) == 0) {
+	if (__builtin_setjmp(myErrorJmp) == 0) {
 		tf = bin ? luaU_undump1(z) : luaY_parser(z);
 		status = 0;
 	} else {

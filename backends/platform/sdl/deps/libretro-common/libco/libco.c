@@ -7,7 +7,11 @@
 #if defined(__GNUC__) && defined(__i386__) || (defined(_MSC_VER) && defined(_M_IX86))
   #include "x86.c"
 #elif defined(__GNUC__) && defined(__amd64__) || (defined(_MSC_VER) && defined(_M_AMD64))
+#ifndef LIBCOFIBER
   #include "amd64.c"
+#else
+  #include "fiber.c"
+#endif
 #elif defined(__GNUC__) && defined(_ARCH_PPC)
   #include "ppc.c"
 #elif defined(__GNUC__) && (defined(__ARM_EABI__) || defined(__arm__))

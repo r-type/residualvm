@@ -346,7 +346,7 @@ void runtasks(LState *const rootState) {
 		if (!lua_state->all_paused && !lua_state->updated && !lua_state->paused) {
 			jmp_buf	errorJmp;
 			lua_state->errorJmp = &errorJmp;
-			if (setjmp(errorJmp)) {
+			if (__builtin_setjmp(errorJmp)) {
 				lua_Task *t, *m;
 				for (t = lua_state->task; t != nullptr;) {
 					m = t->next;

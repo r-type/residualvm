@@ -8,7 +8,8 @@
 #ifndef WIIU
 #define SCUMM_LITTLE_ENDIAN
 #undef SCUMM_BIG_ENDIAN
-#undef SCUMM_NEED_ALIGNMENT
+//#undef SCUMM_NEED_ALIGNMENT
+#define SCUMM_NEED_ALIGNMENT
 #else
 #undef SCUMM_LITTLE_ENDIAN
 #define SCUMM_BIG_ENDIAN
@@ -78,14 +79,20 @@ typedef signed short int16;
 
 typedef signed int int32;
 
-#ifdef WIIU
+#if defined(WIIU)
 typedef signed long long int64;
 typedef unsigned long long uint64;
 typedef uint32 uintptr;
 #else
+#if defined(WIN64CROSS)
+typedef signed long long int64;
+typedef unsigned long long uint64;
+typedef uint64 uintptr;
+#else
 typedef signed long int64;
 typedef unsigned long uint64;
 typedef uint64  uintptr;
+#endif
 #endif
 
 #if defined(__APPLE__) && !defined(__ppc__)

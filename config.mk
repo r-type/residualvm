@@ -23,9 +23,9 @@ else ifeq ($(platform), wincross64)
 AR = x86_64-w64-mingw32-ar rcs
 CC = x86_64-w64-mingw32-gcc
 CXX = x86_64-w64-mingw32-g++ 
-CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -fpermissive -DWIN32
-CFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native  -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32
-LIBS += -lws2_32 -luser32 -lwinmm -ladvapi32 -lshlwapi -lwsock32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -lmingw32 -shared -lgcc -lm -lmingw32
+CXXFLAGS := -DWIN64CROSS -DHAVE_LIBCO=1 -D__LIBRETRO__ -O2 -fpermissive -DWIN32 -fno-omit-frame-pointer -D__USE_MINGW_ANSI_STDIO=0 
+CFLAGS := -DWIN64CROSS  -DLIBCOFIBER -DHAVE_LIBCO=1 -D__LIBRETRO__ -O2 -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32 -fno-omit-frame-pointer -D__USE_MINGW_ANSI_STDIO=0 
+LIBS +=  -shared -static-libgcc -static-libstdc++ -lm -lmingw32 -lwinmm -lgdi32 
 LD := x86_64-w64-mingw32-g++ 
 RANLIB := x86_64-w64-mingw32-ranlib
 STRIP := x86_64-w64-mingw32-strip
@@ -57,8 +57,8 @@ else
 AR = ar rcs
 CC = gcc
 CXX = g++ 
-CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -fpermissive -DWIN32
-CFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native  -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32
+CXXFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native -ansi -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -fpermissive -DWIN32 -m64 
+CFLAGS :=  -DHAVE_LIBCO=1 -fPIC -D__LIBRETRO__ -fno-exceptions -O3 -march=native  -W -Wno-unused-parameter -Wno-empty-body -pedantic -Wno-long-long -DWANT_ZLIB  -DFPM_DEFAULT -DFT2_BUILD_LIBRARY -DJDCT_DEFAULT=JDCT_IFAST -DSIZEOF_SIZE_T=8 -DWIN32 -m64 
 LIBS += -lws2_32 -luser32 -lwinmm -ladvapi32 -lshlwapi -lwsock32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -lmingw32 -shared -lgcc -lm -lmingw32
 LD := g++ 
 RANLIB := ranlib
@@ -105,7 +105,11 @@ CXX_UPDATE_DEP_FLAG = -MMD -MF "$(*D)/$(DEPDIR)/$(*F).d" -MQ "$@" -MP
 SDL_BACKEND = 1
 #USE_SDL2 = 1
 # USE_SDL_NET = 1
+ifeq ($(platform), wincross64)
+WIN32 = 1
+else
 POSIX = 1
+endif
 VERBOSE_BUILD = 1
 # USE_ELF_LOADER = 1
 # DYNAMIC_MODULES = 1
@@ -173,7 +177,7 @@ OBJS +=
 DEFINES += -DSDL_BACKEND -DPOSIX -DDATA_PATH=\"${datarootdir}/residualvm\" -DPLUGIN_DIRECTORY=\"${exec_prefix}/lib/residualvm\"
 
 ifeq ($(platform), wincross64)
-LDFLAGS += --shared -static-libgcc -static-libstdc++ -Wl,--version-script=./link.T -L/usr/x86_64-w64-mingw32/lib -Wl,--export-all-symbols
+LDFLAGS += -m64 --shared -static-libgcc -static-libstdc++ -Wl,--version-script=./link.T -L/usr/x86_64-w64-mingw32/lib -Wl,--export-all-symbols
 else
 LDFLAGS += -fPIC  -shared -Wl,--no-undefined -Wl,--version-script=./link.T
 endif

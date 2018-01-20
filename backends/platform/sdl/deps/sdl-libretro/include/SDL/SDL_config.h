@@ -317,7 +317,7 @@
 #define SDL_THREAD_PTHREAD 1
 #define SDL_CDROM_DUMMY 1
 #else
-#warning WIN32 CDROM&THREAD
+//#warning WIN32 CDROM&THREAD
 #define SDL_THREAD_WIN32 1
 #define SDL_CDROM_WIN32 1
 #endif

@@ -152,6 +152,7 @@ MODULE_OBJS += \
 	networking/connection/islimited-default.o
 endif
 
+
 ifdef POSIX
 MODULE_OBJS += \
 	fs/posix/posix-fs.o \
@@ -162,6 +163,7 @@ MODULE_OBJS += \
 	saves/posix/posix-saves.o \
 	taskbar/unity/unity-taskbar.o
 endif
+
 
 ifdef MACOSX
 MODULE_OBJS += \

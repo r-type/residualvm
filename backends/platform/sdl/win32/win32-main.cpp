@@ -38,7 +38,7 @@
 #include "backends/platform/sdl/win32/win32.h"
 #include "backends/plugins/sdl/sdl-provider.h"
 #include "base/main.h"
-
+#ifndef __LIBRETRO__
 int __stdcall WinMain(HINSTANCE /*hInst*/, HINSTANCE /*hPrevInst*/,  LPSTR /*lpCmdLine*/, int /*iShowCmd*/) {
 #if !SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_SetModuleHandle(GetModuleHandle(NULL));
@@ -55,8 +55,8 @@ int __stdcall WinMain(HINSTANCE /*hInst*/, HINSTANCE /*hPrevInst*/,  LPSTR /*lpC
 	return main(__argc, __argv);
 #endif
 }
-
-int main(int argc, char *argv[]) {
+#endif
+int smain(int argc, char *argv[]) {
 	// Create our OSystem instance
 	g_system = new OSystem_Win32();
 	assert(g_system);

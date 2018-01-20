@@ -32,6 +32,7 @@
 #undef ARRAYSIZE // winnt.h defines ARRAYSIZE, but we want our own one...
 
 void SdlWindow_Win32::setupIcon() {
+#ifndef __LIBRETRO__
 	HMODULE handle = GetModuleHandle(NULL);
 	HICON   ico    = LoadIcon(handle, MAKEINTRESOURCE(1001 /* IDI_ICON */));
 	if (ico) {
@@ -54,6 +55,9 @@ void SdlWindow_Win32::setupIcon() {
 
 	// If no icon has been set, fallback to default path
 	SdlWindow::setupIcon();
+#else
+return;
+#endif
 }
 
 #endif
